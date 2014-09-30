@@ -25,7 +25,7 @@ class RpcClient extends BaseAmqp
             throw new \InvalidArgumentException('You must provide a $requestId');
         }
 
-        $msg = new AMQPMessage($msgBody, array('content_type' => 'text/plain',
+        $msg = new AMQPMessage($msgBody, array('content_type' => 'application/json',
                                                'reply_to' => $this->getQueueName(),
                                                'delivery_mode' => 1, // non durable
                                                'expiration' => $expiration*1000,
