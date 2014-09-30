@@ -283,7 +283,7 @@ class OldSoundRabbitMqExtension extends Extension
                 $this->injectLoggedChannel($definition, $key, $client['connection']);
             }
 
-            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_rpc', $key), $definition);
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s', $key), $definition);
         }
     }
 

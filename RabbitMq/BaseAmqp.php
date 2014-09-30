@@ -163,7 +163,9 @@ abstract class BaseAmqp
                     $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $routingKey);
                 }
             } else {
-                $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                if ($this->exchangeOptions['declare']) {
+                    $this->getChannel()->queue_bind($queueName, $this->exchangeOptions['name'], $this->routingKey);
+                }
             }
 
             $this->queueDeclared = true;

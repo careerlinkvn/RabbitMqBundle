@@ -8,8 +8,8 @@ class RpcServer extends BaseConsumer
 {
     public function initServer($name)
     {
-        $this->setExchangeOptions(array('name' => $name, 'type' => 'direct'));
-        $this->setQueueOptions(array('name' => $name . '-queue'));
+        $this->setExchangeOptions(array('name' => '', 'type' => 'direct', 'declare' => false));
+        $this->setQueueOptions(array('name' => $name));
     }
 
     public function processMessage(AMQPMessage $msg)
