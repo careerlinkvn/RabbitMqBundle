@@ -61,7 +61,7 @@ class MultipleConsumer extends Consumer
             throw new QueueNotFoundException();
         }
 
-        $processFlag = call_user_func($this->queues[$queueName]['callback'], $msg);
+        $processFlag = call_user_func_array($this->queues[$queueName]['callback'], array($msg, $queueName));
 
         $this->handleProcessMessage($msg, $processFlag);
     }
