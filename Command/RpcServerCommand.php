@@ -18,6 +18,7 @@ class RpcServerCommand extends BaseRabbitMqCommand
             ->setName('rabbitmq:rpc-server')
             ->addArgument('name', InputArgument::REQUIRED, 'Server Name')
             ->addOption('messages', 'm', InputOption::VALUE_OPTIONAL, 'Messages to consume', 0)
+            ->addOption('memory-limit', 'l', InputOption::VALUE_OPTIONAL, 'Allowed memory for this process', null)
             ->addOption('debug', 'd', InputOption::VALUE_OPTIONAL, 'Debug mode', false)
         ;
     }
@@ -41,8 +42,13 @@ class RpcServerCommand extends BaseRabbitMqCommand
             throw new \InvalidArgumentException("The -m option should be null or greater than 0");
         }
 
-        $this->getContainer()
-               ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')))
-               ->start($amount);
+        $rpcServer = $this->getContainer()
+            ->get(sprintf('old_sound_rabbit_mq.%s_server', $input->getArgument('name')));
+
+        if (!is_null($input->getOption('memory-limit')) && ctype_digit((string)$input->getOption('memory-limit')) && $input->getOption('memory-limit') > 0) {
+            $rpcServer->setMemoryLimit($input->getOption('memory-limit'));
+        }
+
+        $rpcServer->start($amount);
     }
 }
