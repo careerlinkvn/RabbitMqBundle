@@ -51,6 +51,8 @@ class RpcServer extends BaseConsumer
             }
         } catch (\Exception $e) {
             $this->sendReply('error: ' . $e->getMessage(), $msg->get('reply_to'), $msg->get('correlation_id'));
+
+            throw $e;
         }
     }
 
