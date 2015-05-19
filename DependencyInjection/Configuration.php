@@ -34,6 +34,7 @@ class Configuration implements ConfigurationInterface
         $this->addAnonConsumers($rootNode);
         $this->addRpcClients($rootNode);
         $this->addRpcServers($rootNode);
+        $this->addMultipleRpcServers($rootNode);
 
         return $tree;
     }
@@ -194,6 +195,31 @@ class Configuration implements ConfigurationInterface
                                     ->scalarNode('prefetch_count')->defaultValue(0)->end()
                                     ->booleanNode('global')->defaultFalse()->end()
                                 ->end()
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ;
+    }
+
+    protected function addMultipleRpcServers(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->arrayNode('multiple_rpc_servers')
+                ->canBeUnset()
+                ->useAttributeAsKey('key')
+                ->prototype('array')
+                    ->children()
+                        ->scalarNode('connection')->defaultValue('default')->end()
+                        ->append($this->getMultipleQueuesConfiguration())
+                        ->arrayNode('qos_options')
+                            ->canBeUnset()
+                            ->children()
+                                ->scalarNode('prefetch_size')->defaultValue(0)->end()
+                                ->scalarNode('prefetch_count')->defaultValue(0)->end()
+                                ->booleanNode('global')->defaultFalse()->end()
                             ->end()
                         ->end()
                     ->end()

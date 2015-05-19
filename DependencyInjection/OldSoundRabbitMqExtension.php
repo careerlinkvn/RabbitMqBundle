@@ -52,6 +52,7 @@ class OldSoundRabbitMqExtension extends Extension
         $this->loadAnonConsumers();
         $this->loadRpcClients();
         $this->loadRpcServers();
+        $this->loadMultipleRpcServers();
 
         if ($this->collectorEnabled && $this->channelIds) {
             $channels = array();
@@ -308,6 +309,41 @@ class OldSoundRabbitMqExtension extends Extension
                 ));
             }
             $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_server', $key), $definition);
+        }
+    }
+
+    protected function loadMultipleRpcServers()
+    {
+        foreach ($this->config['multiple_rpc_servers'] as $key => $server) {
+            $queues = array();
+
+            foreach ($server['queues'] as $queueName => $queueOptions) {
+                $queues[$queueOptions['name']]  = $queueOptions;
+                $queues[$queueOptions['name']]['callback'] = array(new Reference($queueOptions['callback']), 'execute');
+            }
+
+            $definition = new Definition('%old_sound_rabbit_mq.multi_rpc_server.class%');
+            $definition
+                ->addTag('old_sound_rabbit_mq.base_amqp')
+                ->addTag('old_sound_rabbit_mq.multi_rpc_server')
+                ->addMethodCall('initServer', array(array_keys($queues)))
+                ->addMethodCall('setQueues', array($this->normalizeArgumentKeys($queues)));
+
+            $this->injectConnection($definition, $server['connection']);
+
+            if ($this->collectorEnabled) {
+                $this->injectLoggedChannel($definition, $key, $server['connection']);
+            }
+
+            if (array_key_exists('qos_options', $server)) {
+                $definition->addMethodCall('setQosOptions', array(
+                    $server['qos_options']['prefetch_size'],
+                    $server['qos_options']['prefetch_count'],
+                    $server['qos_options']['global']
+                ));
+            }
+
+            $this->container->setDefinition(sprintf('old_sound_rabbit_mq.%s_multiple_server', $key), $definition);
         }
     }
 
