@@ -317,7 +317,7 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('passive')->defaultFalse()->end()
                 ->booleanNode('durable')->defaultFalse()->end()
                 ->booleanNode('exclusive')->defaultFalse()->end()
-                ->booleanNode('auto_delete')->defaultTrue()->end()
+                ->booleanNode('auto_delete')->defaultFalse()->end()
                 ->booleanNode('nowait')->defaultFalse()->end()
                 ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
