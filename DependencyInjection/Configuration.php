@@ -213,7 +213,7 @@ class Configuration implements ConfigurationInterface
                 ->prototype('array')
                     ->children()
                         ->scalarNode('connection')->defaultValue('default')->end()
-                        ->append($this->getMultipleQueuesConfiguration())
+                        ->append($this->getMultipleRpcQueuesConfiguration())
                         ->arrayNode('qos_options')
                             ->canBeUnset()
                             ->children()
@@ -273,6 +273,22 @@ class Configuration implements ConfigurationInterface
         return $node;
     }
 
+    protected function getMultipleRpcQueuesConfiguration()
+    {
+        $node = new ArrayNodeDefinition('queues');
+        $prototypeNode = $node->requiresAtLeastOneElement()->prototype('array');
+
+        $this->addRpcQueueNodeConfiguration($prototypeNode);
+
+        $prototypeNode->children()
+            ->scalarNode('callback')->isRequired()->end()
+        ->end();
+
+        $prototypeNode->end();
+
+        return $node;
+    }
+
     protected function addQueueNodeConfiguration(ArrayNodeDefinition $node)
     {
         $node
@@ -282,6 +298,26 @@ class Configuration implements ConfigurationInterface
                 ->booleanNode('durable')->defaultTrue()->end()
                 ->booleanNode('exclusive')->defaultFalse()->end()
                 ->booleanNode('auto_delete')->defaultFalse()->end()
+                ->booleanNode('nowait')->defaultFalse()->end()
+                ->variableNode('arguments')->defaultNull()->end()
+                ->scalarNode('ticket')->defaultNull()->end()
+                ->arrayNode('routing_keys')
+                    ->prototype('scalar')->end()
+                    ->defaultValue(array())
+                ->end()
+            ->end()
+        ;
+    }
+
+    protected function addRpcQueueNodeConfiguration(ArrayNodeDefinition $node)
+    {
+        $node
+            ->children()
+                ->scalarNode('name')->isRequired()->end()
+                ->booleanNode('passive')->defaultFalse()->end()
+                ->booleanNode('durable')->defaultFalse()->end()
+                ->booleanNode('exclusive')->defaultFalse()->end()
+                ->booleanNode('auto_delete')->defaultTrue()->end()
                 ->booleanNode('nowait')->defaultFalse()->end()
                 ->variableNode('arguments')->defaultNull()->end()
                 ->scalarNode('ticket')->defaultNull()->end()
